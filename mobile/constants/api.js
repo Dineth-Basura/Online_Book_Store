@@ -1,6 +1,9 @@
 import { Platform } from "react-native";
 import Constants from "expo-constants";
 
+// ── Production backend URL (Railway) ──────────────────────
+const PRODUCTION_URL = "https://onlinebookstore-production-73ec.up.railway.app";
+
 const getExpoHost = () => {
 	const hostFromExpoGo = Constants.expoGoConfig?.debuggerHost;
 	if (hostFromExpoGo) return hostFromExpoGo.split(":")[0];
@@ -13,12 +16,11 @@ const getExpoHost = () => {
 
 const expoHost = getExpoHost();
 
-// Prefer Expo's auto-detected host (always matches dev machine IP),
-// then fall back to .env, then platform defaults.
+// In dev mode, use local server; in production, use Railway
 const getBaseUrl = () => {
-	if (expoHost) return `http://${expoHost}:5000`;
+	if (__DEV__ && expoHost) return `http://${expoHost}:5000`;
 	if (process.env.EXPO_PUBLIC_API_URL) return process.env.EXPO_PUBLIC_API_URL;
-	return Platform.OS === "android" ? "http://10.0.2.2:5000" : "http://localhost:5000";
+	return PRODUCTION_URL;
 };
 
 const resolvedBaseUrl = getBaseUrl();
